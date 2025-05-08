@@ -133,7 +133,7 @@ if __name__ == '__main__':
 
     test_pred = []
     with torch.no_grad():
-        with tqdm(total=len(test_loader), desc='Predction') as Pbar:
+        with tqdm(total=len(test_loader), desc='Predction') as pbar:
             for batch in test_loader:
                 input_ids = batch['input_ids'].to(device)
                 attention_mask = batch['attention_mask'].to(device)
