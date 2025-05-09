@@ -23,3 +23,5 @@ Epoch 0: train loss=0.1784, train acc=0.93, val loss=0.1304, val acc=0.95
 Epoch 1: train loss=0.1023, train acc=0.97, val loss=0.1361, val acc=0.95
 Epoch 2: train loss=0.0635, train acc=0.98, val loss=0.1630, val acc=0.95
 ```
+在kaggle上的评分
+![alt text](image-1.png)
