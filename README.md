@@ -58,5 +58,39 @@ Epoch 2: train loss=0.0635, train acc=0.98, val loss=0.1630, val acc=0.95
 
 ![alt text](image-2.png)
 
+- imdb_deberta_prompt
+<table border="1" class="dataframe">
+<thead>
+ <tr style="text-align: left;">
+      <th>Epoch</th>
+      <th>Training Loss</th>
+      <th>Validation Loss</th>
+      <th>Accuracy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>0.945800</td>
+      <td>0.739726</td>
+      <td>0.861200</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>0.639500</td>
+      <td>0.502881</td>
+      <td>0.910400</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>0.535400</td>
+      <td>0.488399</td>
+      <td>0.916800</td>
+    </tr>
+  </tbody>
+</table><p>
+
+![alt text](image-3.png)
+
 在kaggle上的评分
 ![alt text](image-1.png)
