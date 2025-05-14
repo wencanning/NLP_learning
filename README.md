@@ -23,5 +23,40 @@ Epoch 0: train loss=0.1784, train acc=0.93, val loss=0.1304, val acc=0.95
 Epoch 1: train loss=0.1023, train acc=0.97, val loss=0.1361, val acc=0.95
 Epoch 2: train loss=0.0635, train acc=0.98, val loss=0.1630, val acc=0.95
 ```
+
+- **imdb_deberta_lora**
+    <table border="1" class="dataframe">
+  <thead>
+ <tr style="text-align: left;">
+      <th>Epoch</th>
+      <th>Training Loss</th>
+      <th>Validation Loss</th>
+      <th>Accuracy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>0.234300</td>
+      <td>0.236316</td>
+      <td>0.962250</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>0.131400</td>
+      <td>0.210252</td>
+      <td>0.964000</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>0.321800</td>
+      <td>0.209702</td>
+      <td>0.964750</td>
+    </tr>
+  </tbody>
+</table><p>
+
+![alt text](image-2.png)
+
 在kaggle上的评分
 ![alt text](image-1.png)
