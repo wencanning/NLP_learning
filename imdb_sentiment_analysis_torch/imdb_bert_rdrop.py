@@ -36,6 +36,8 @@ class BertScratch(BertPreTrainedModel):
         self.config = config
 
         self.bert = BertModel(config)
+
+        # dropout 的概率
         classifier_dropout = (
             config.classifier_dropout if config.classifier_dropout is not None else config.hidden_dropout_prob
         )
