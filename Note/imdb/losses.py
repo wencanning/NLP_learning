@@ -35,6 +35,7 @@ class SupConLoss(nn.Module):
                   if features.is_cuda
                   else torch.device('cpu'))
 
+        
         features = features.view(features.shape[0], features.shape[1], -1)
 
         batch_size = features.shape[0]
@@ -49,7 +50,18 @@ class SupConLoss(nn.Module):
             mask = torch.eq(labels, labels.T).float().to(device)
         else:
             mask = mask.float().to(device)
-
+        """ 
+            contrast_feature: [
+                [1.0, 2.0],  # 样本0视图1
+                [3.0, 4.0],  # 样本1视图1
+                [5.0, 6.0],  # 样本2视图1
+                [7.0, 8.0],  # 样本3视图1
+                [2.0, 3.0],  # 样本0视图2
+                [4.0, 5.0],  # 样本1视图2
+                [6.0, 7.0],  # 样本2视图2
+                [8.0, 9.0]   # 样本3视图2
+            ]
+        """
         contrast_count = features.shape[1]
         contrast_feature = torch.cat(torch.unbind(features, dim=1), dim=0)
         if self.contrast_mode == 'one':
@@ -61,11 +73,12 @@ class SupConLoss(nn.Module):
         else:
             raise ValueError('Unknown mode: {}'.format(self.contrast_mode))
 
-        # compute logits
+        # 即计算每对样本的similarity
         anchor_dot_contrast = torch.div(
             torch.matmul(anchor_feature, contrast_feature.T),
             self.temperature)
-        # for numerical stability
+        # 减去每行的最大值，防止指数溢出，同时logits_max.detach()
+        # detach() 确保 logits_max 仅作为标量偏移量使用，不参与参数更新，避免对原始张量的梯度产生干扰
         logits_max, _ = torch.max(anchor_dot_contrast, dim=1, keepdim=True)
         logits = anchor_dot_contrast - logits_max.detach()
 
