@@ -1,7 +1,7 @@
 import os
 os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
-from unsloth import tokenizer_utils, FastLanguageModel
+from unsloth import FastLanguageModel
 import torch
 import datasets
 import pandas as pd
@@ -91,7 +91,7 @@ positivelabel = "Yes"
 negativelabel = "No"
 
 
-def formatting_prompts_func(dataset_):
+def formatting_prompts_func(dataset_):# -> list[str] | list | Literal[' ']:# -> list[str] | list | Literal[' ']:
     # this is to fix an issue with a certain transformers version, you might not need this
     if isinstance(dataset_['text'], str):
         if model_name.lower().__contains__("qwen"):
@@ -166,6 +166,8 @@ trainer = SFTTrainer(
         report_to = "none",
         group_by_length = True,
     ),
+    # Formatting function applied to the dataset before tokenization. 
+    # Applying the formatting function explicitly converts the dataset into a language modeling type.
     formatting_func=formatting_prompts_func,
     data_collator=collator,
 )

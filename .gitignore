@@ -2,3 +2,5 @@ imdb_glove.pickle3
 dataset/
 test-trainer
 __pycache__
+unsloth_compiled_cache
+_unsloth_temporary_saved_buffers
