@@ -2,16 +2,21 @@ import os
 import sys
 import logging
 import datasets
+import evaluate
 
 import pandas as pd
 import numpy as np
 
 from transformers import DistilBertTokenizerFast, DistilBertForSequenceClassification, DataCollatorWithPadding
 from transformers import Trainer, TrainingArguments
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
 from sklearn.model_selection import train_test_split
 
-train = pd.read_csv("./corpus/imdb/labeledTrainData.tsv", header=0, delimiter="\t", quoting=3)
-test = pd.read_csv("./corpus/imdb/testData.tsv", header=0, delimiter="\t", quoting=3)
+labeledTrainDataPath = r"D:\workplace\NLP_learning\dataset\labeledTrainData.tsv"
+testDataPath = r"D:\workplace\NLP_learning\dataset\testData.tsv"
+
+train = pd.read_csv(labeledTrainDataPath, header=0, delimiter="\t", quoting=3)
+test = pd.read_csv(testDataPath, header=0, delimiter="\t", quoting=3)
 
 if __name__ == '__main__':
     program = os.path.basename(sys.argv[0])
@@ -31,7 +36,9 @@ if __name__ == '__main__':
     val_dataset = datasets.Dataset.from_dict(val_dict)
     test_dataset = datasets.Dataset.from_dict(test_dict)
 
-    tokenizer = DistilBertTokenizerFast.from_pretrained('distilbert-base-uncased')
+    checkpoint = "microsoft/deberta-v3-base"
+
+    tokenizer = AutoTokenizer.from_pretrained(checkpoint)
 
 
     def preprocess_function(examples):
@@ -43,9 +50,10 @@ if __name__ == '__main__':
 
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
-    model = DistilBertForSequenceClassification.from_pretrained('distilbert-base-uncased')
+    model = AutoModelForSequenceClassification.from_pretrained(checkpoint)
 
-    metric = datasets.load_metric("accuracy")
+
+    metric = evaluate.load("accuracy")
 
     def compute_metrics(eval_pred):
         logits, labels = eval_pred
@@ -63,7 +71,7 @@ if __name__ == '__main__':
         logging_dir='./logs',  # directory for storing logs
         logging_steps=100,
         save_strategy="no",
-        evaluation_strategy="epoch"
+        eval_strategy="epoch"
     )
 
     trainer = Trainer(
@@ -77,6 +85,8 @@ if __name__ == '__main__':
     )
 
     trainer.train()
+
+    model.save_pretrained('deberta-v3-base-finetuned')
 
     prediction_outputs = trainer.predict(tokenized_test)
     test_pred = np.argmax(prediction_outputs[0], axis=-1).flatten()
