@@ -4,7 +4,7 @@ import os
 os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 
-model_name = "/home/wangjin/models/Meta-Llama-3.1-8B-bnb-4bit"
+model_name = "unsloth/Meta-Llama-3.1-8B-bnb-4bit"
 load_in_4bit = True
 max_seq_length = 4096
 dtype = None
@@ -101,14 +101,14 @@ args = DPOConfig(
 )
 
 
-orpo_trainer = DPOTrainer(
+dpo_trainer = DPOTrainer(
     model=model,
     train_dataset=dataset,
     tokenizer=tokenizer,
     args=args,
 )
 
-orpo_trainer.train()
+dpo_trainer.train()
 
 
 # alpaca_prompt = Copied from above
