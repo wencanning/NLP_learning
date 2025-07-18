@@ -5,7 +5,6 @@ os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 from transformers import AutoTokenizer
-
 tokenizer = AutoTokenizer.from_pretrained('EleutherAI/pythia-160m')
 tokenizer.add_special_tokens({'pad_token': '[PAD]'})
 
@@ -15,7 +14,6 @@ from datasets import load_dataset, concatenate_datasets
 dataset = load_dataset('imdb')
 dataset = concatenate_datasets(list((dataset.values())))
 dataset = dataset.remove_columns(['label'])
-
 
 def collator(data):
     data = [i['text'] for i in data]
@@ -53,7 +51,7 @@ model_actor = AutoModelForCausalLM.from_pretrained(
 
 optimizer = torch.optim.Adam(model_actor.parameters(), lr=1e-5)
 
-for epoch in range(10):
+for epoch in range(3):
     for i, data in enumerate(loader):
         out = model_actor(**data)
         out.loss.backward()
@@ -80,4 +78,4 @@ for epoch in range(10):
             print('chosen=', tokenizer.decode(chosen))
             print('gen=', tokenizer.decode(gen))
 
-model_actor.save_pretrained('model/actor')
+model_actor.save_pretrained('./model/actor')

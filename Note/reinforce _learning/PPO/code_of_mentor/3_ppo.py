@@ -40,14 +40,14 @@ loader = torch.utils.data.DataLoader(
 from transformers import AutoModelForCausalLM, AutoModelForSequenceClassification
 from trl.trainer.utils import disable_dropout_in_model
 
-model_actor = AutoModelForCausalLM.from_pretrained('model/actor').to(device)
-model_actor_ref = AutoModelForCausalLM.from_pretrained('model/actor').to(
+model_actor = AutoModelForCausalLM.from_pretrained('./model/actor').to(device)
+model_actor_ref = AutoModelForCausalLM.from_pretrained('./model/actor').to(
     device)
 
 model_critic = AutoModelForSequenceClassification.from_pretrained(
-    'model/critic', num_labels=1).to(device)
+    './model/critic', num_labels=1).to(device)
 model_critic_ref = AutoModelForSequenceClassification.from_pretrained(
-    'model/critic', num_labels=1).to(device)
+    './model/critic', num_labels=1).to(device)
 
 model_actor.generation_config.eos_token_id = None
 model_actor.generation_config.pad_token_id = None
@@ -62,11 +62,17 @@ optimizer = torch.optim.AdamW(
 )
 
 
-
+# 计算state value
 def get_value(critic, question, answer, shift=True):
+    # 将question和answer拼在一起
     input_ids = torch.cat((question, answer), 1)
+    # 创建注意力掩码
     attention_mask = input_ids != tokenizer.pad_token_id
+    # position_ids 是 ​​Transformer 模型用来表示 token 在序列中的绝对位置​​的索引
+    # 通常通过 ​​位置嵌入（Position Embeddings）​​ 来实现
+    # cumsum(dim)沿着指定维度作累加求和
     position_ids = attention_mask.cumsum(1) - attention_mask.long()
+
     input_ids = torch.masked_fill(input_ids, ~attention_mask, 0)
 
     #[b, lens, 768]
@@ -78,6 +84,9 @@ def get_value(critic, question, answer, shift=True):
     #[b, lens]
     value = critic.score(last_hidden_state)
 
+    # 提取与回答生成过程相关的状态值
+    # state value: 从问题最后一个token位置到序列倒数第二个token
+    # V(s_t) 应该预测从状态 s_t（生成第 *t* 个token前的状态）开始的未来累积奖励（即还没有生产第k个token）
     if shift:
         value = value[:, question.shape[1] - 1:-1].squeeze(-1)
 
@@ -134,7 +143,7 @@ print(get_advantage(torch.randn(4, 25), torch.randn(4, 25)).shape)
 
 from trl.trainer.utils import first_true_indices
 
-
+# 用来生成experience
 @torch.no_grad()
 def get_data(question):
     #====answer====
@@ -149,6 +158,7 @@ def get_data(question):
         top_p=1.0,
         do_sample=True)
 
+    # 答案是 answer + question 的token序列
     answer = answer[:, question.shape[1]:]
 
     #求结束位置
@@ -206,7 +216,9 @@ def get_data(question):
 
 print(get_data(next(iter(loader))))
 
+
 def train(question, answer, ends, prob_old, value_old, advantage, returns):
+    # 一个experience用来更新4次Actor和Critic
     for _ in range(4):
         #重新计算value和prob
         prob_new = get_logprob(model_actor, question, answer)
@@ -218,6 +230,8 @@ def train(question, answer, ends, prob_old, value_old, advantage, returns):
             value_new[i, end + 1:] = 0
 
         #计算critic部分的loss
+        #critic模型的loss定义为（预估预期收益-实际预期收益）**2
+        #value_new是预期收益，advantage+value_old为return，实际收益
         value_clip = torch.clamp(value_new, value_old - 0.2, value_old + 0.2)
         loss_vf1 = (value_new - returns)**2
         loss_vf2 = (value_clip - returns)**2
@@ -232,6 +246,7 @@ def train(question, answer, ends, prob_old, value_old, advantage, returns):
         #丢弃end之后的部分
         loss_vf = [xi[:end + 1] for xi, end in zip(loss_vf, ends)]
         loss_pg = [xi[:end + 1] for xi, end in zip(loss_pg, ends)]
+        # 取平均
         loss_vf = torch.cat(loss_vf).mean()
         loss_pg = torch.cat(loss_pg).mean()
 
@@ -265,4 +280,4 @@ for i in range(4000):
         print(tokenizer.decode(gen[0, input_ids.shape[1]:]))
         print('====================')
 
-model_actor.save_pretrained('model/ppo')
+model_actor.save_pretrained('./model/ppo')

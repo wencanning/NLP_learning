@@ -53,7 +53,7 @@ print(model_critic.config)
 
 optimizer = torch.optim.Adam(model_critic.parameters(), lr=1e-5)
 
-for epoch in range(10):
+for epoch in range(3):
     for i, data in enumerate(loader):
         out = model_critic(**data)
         out.loss.backward()
@@ -65,4 +65,4 @@ for epoch in range(10):
             acc = (logits == data['labels'].long()).sum() / len(data['labels'])
             print(epoch, i, len(loader), out.loss.item(), acc.item())
 
-model_critic.save_pretrained('model/critic')
+model_critic.save_pretrained('./model/critic')
