@@ -6,7 +6,16 @@ part 2： Emotion-LLaMA。该模型通过特定情绪（emotion-specific encoder
 
 ## 1 Introduction
 
+指出不足
 
+- 多模态融合方法： 仅仅关注特征融合和模态补全，没有关注到知识层面融合的重要性
+- MLLM：处理音频能力的不足，不能辨认微表情。同时作者指出这是由于缺乏专门的多模态情感指令数据集
+
+## 2 Related Work
+
+**MLLMs：** 指出现有的MLLM，即使是最先进的模型GPT-4V，也缺乏 处理音频线索和辨认微表情 的能力。这是因为他们缺乏在多模态情绪数据集和情绪相关知识上的专门训练。Emotion-LLaMA 采用 emotion-specific encoder 来采集多模态特征，因此提高了情绪辨认和推理能力。
+
+**Instruction Tuning：** 为了解决与情绪相关的指令跟随数据的稀缺性，我们的方法使用先验知识生成多模态描述。
 
 ## 3 **Methodology**
 
@@ -28,7 +37,11 @@ part 2： Emotion-LLaMA。该模型通过特定情绪（emotion-specific encoder
 
 ![image-20250913154111093](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20250913154111093.png)
 
+### 3.2 Multimodal Emotion-LLaMA Model
 
+
+
+![image-20250914114959827](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20250914114959827.png)
 
 
 
